@@ -17,7 +17,7 @@ public class ShooterElevation extends Command {
 
   private PIDController elevationPID;
 
-  private double maxSpeed = 0.65;
+  private double maxSpeed = 0.85;
 
   public ShooterElevation(Shooter shooter) {
     this.shooter = shooter;
@@ -42,7 +42,7 @@ public class ShooterElevation extends Command {
   public void execute() {
 
     double speed = elevationPID
-        .calculate(MathUtil.applyDeadband(shooter.getShooterAngle() - shooter.getTargetAngle(), 0.01)) / 16.0;
+        .calculate(MathUtil.applyDeadband(shooter.getShooterAngle() - shooter.getTargetAngle(), 0.0025)) / 3.0;
 
     speed = MathUtil.clamp(speed, -maxSpeed, maxSpeed);
 

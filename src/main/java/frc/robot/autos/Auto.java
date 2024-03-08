@@ -16,15 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Auto extends Command {
 
     private Drive drive;
-    private PathPlannerPath path;
-    private PathPlannerPath path2;
 
     public Auto() {
-        drive = RobotContainer.getDrive();
-
-        path = PathPlannerPath.fromPathFile("Straight Line");
-        path2 = PathPlannerPath.fromPathFile("Left Line");
-        
+        drive = RobotContainer.getDrive();        
 
         AutoBuilder.configureHolonomic(
                 drive::getPose,
@@ -46,6 +40,7 @@ public class Auto extends Command {
                 () -> {
                     var alliance = DriverStation.getAlliance();
                     if (alliance.isPresent()) {
+                        //return true;
                         return alliance.get() == DriverStation.Alliance.Red;
                     }
                     return false;
@@ -53,17 +48,5 @@ public class Auto extends Command {
                 drive);
 
         addRequirements(drive);
-    }
-
-    public Command getAutoCommandSL() {
-        return AutoBuilder.followPath(path);
-    }
-
-    public Command getAutoLEFT(){
-        return AutoBuilder.followPath(path2);
-    }
-
-    public PathPlannerPath getPath() {
-        return path;
     }
 }

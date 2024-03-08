@@ -32,7 +32,7 @@ public class FeedToShooter extends Command {
 
   @Override
   public boolean isFinished() {
-    return false || RobotContainer.getIntakeCancelButton();
-    //return (shooter.getRange() < 75.0 && shooter.getSensorSigma() <= 1.25) || RobotContainer.getIntakeCancelButton();
+    //return false || RobotContainer.getIntakeCancelButton();
+    return shooter.getRange() < 125 || RobotContainer.getIntakeCancelButton();
   }
 }

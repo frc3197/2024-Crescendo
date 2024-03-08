@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 
+import org.photonvision.PhotonCamera;
+
 //import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
-  //private PhotonCamera intakeCamera = new PhotonCamera("intake-camera");
+  private static PhotonCamera intakeCamera = new PhotonCamera("intake-camera");
 
   public Vision() {
 
@@ -19,14 +21,17 @@ public class Vision extends SubsystemBase {
   public void periodic() {
   }
 
-  /*public boolean hasTarget() {
+  public boolean hasTarget() {
     var result = intakeCamera.getLatestResult();
     return result.hasTargets();
   }
 
-  public double[] getBestTarget() {
+  public static double[] getBestTarget() {
     var result = intakeCamera.getLatestResult();
-    var bestTarget = result.getBestTarget();
-    return new double[] { bestTarget.getYaw(), bestTarget.getPitch() };
-  }*/
+    if (result.hasTargets()) {
+      var bestTarget = result.getBestTarget();
+      return new double[] { bestTarget.getYaw(), bestTarget.getPitch() };
+    }
+    return new double[] { 0, 0 };
+  }
 }

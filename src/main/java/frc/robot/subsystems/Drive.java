@@ -16,12 +16,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.proto.Kinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drive extends SubsystemBase {
@@ -37,7 +40,11 @@ public class Drive extends SubsystemBase {
         
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
+        
+        
         gyro.setYaw(0);
+
+        //initialPos = RobotContainer.getInitialPose(); 
 
         mSwerveMods = new SwerveModule[] {
                 new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -48,8 +55,13 @@ public class Drive extends SubsystemBase {
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, new Rotation2d(Units.degreesToRadians(180)), getModulePositions());
 
-        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(),
-                new Pose2d(new Translation2d(15.11, 5.53), new Rotation2d(180)));
+                //RED MID: 15.11, 5.53
+                //RED AMP: 15.86, 6.68
+                //RED SPEAK: 15.82, 4.43
+
+                //BLUE MID: 1.34, 5.56
+                //BLUE AMP: .72, 6.69
+                //BLUE SPEAK: .74, 443
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -71,7 +83,20 @@ public class Drive extends SubsystemBase {
     }
 
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
-        ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+
+        ChassisSpeeds normalSpeeds = new ChassisSpeeds(
+            robotRelativeSpeeds.vxMetersPerSecond,
+            robotRelativeSpeeds.vyMetersPerSecond,
+            robotRelativeSpeeds.omegaRadiansPerSecond
+        );
+
+        ChassisSpeeds newSpeeds = new ChassisSpeeds(
+             
+            RobotContainer.isRed() ? robotRelativeSpeeds.vxMetersPerSecond : robotRelativeSpeeds.vxMetersPerSecond,
+            RobotContainer.isRed() ? robotRelativeSpeeds.vyMetersPerSecond : robotRelativeSpeeds.vyMetersPerSecond,
+            RobotContainer.isRed() ? robotRelativeSpeeds.omegaRadiansPerSecond : robotRelativeSpeeds.omegaRadiansPerSecond*1);
+
+        ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(normalSpeeds, 0.02);
         SwerveModuleState[] targetStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
         setModuleStates(targetStates);
     }
@@ -118,11 +143,20 @@ public class Drive extends SubsystemBase {
     }
 
     public void zeroHeading() {
+
+        if(!RobotContainer.isRed() && DriverStation.isAutonomous())
+        {
+            swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(),
+                new Pose2d(getPose().getTranslation(), new Rotation2d(3.14)));
+                return;
+        }
+
         swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(),
                 new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
     public Rotation2d getGyroYaw() {
+
         return Rotation2d.fromDegrees(gyro.getYaw().getValue());
     }
 
@@ -136,6 +170,11 @@ public class Drive extends SubsystemBase {
         }
     }
 
+    public void setOdometry(Pose2d pose) {
+        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(),
+                pose);
+    }
+
     @Override
     public void periodic() {
         swerveOdometry.update(getGyroYaw(), getModulePositions());
@@ -145,5 +184,17 @@ public class Drive extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
         }
+        SmartDashboard.putNumber("Velocity X", getVelocityX());
+
+        SmartDashboard.putNumber("Xpos", swerveOdometry.getPoseMeters().getX());
+        SmartDashboard.putNumber("Ypos", swerveOdometry.getPoseMeters().getY());
+    }
+
+    public double getVelocityX() {
+        return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()[0], getModuleStates()[1], getModuleStates()[2], getModuleStates()[3]).vxMetersPerSecond;
+    }
+    
+    public double getVelocityY() {
+        return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()[0], getModuleStates()[1], getModuleStates()[2], getModuleStates()[3]).vyMetersPerSecond;
     }
 }

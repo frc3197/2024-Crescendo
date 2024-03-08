@@ -21,10 +21,12 @@ public class Shooter extends SubsystemBase {
   private TalonFX bottomRoller;
   private TalonFX topRoller;
   private TalonFX feedMotor;
+  private TalonFX deflectorMotor;
 
   private CANSparkMax elevationMotor;
 
   private DutyCycleEncoder elevationEncoder;
+  private DutyCycleEncoder deflectorEncoder;
 
   private boolean isRed = RobotContainer.isRed();
 
@@ -34,13 +36,20 @@ public class Shooter extends SubsystemBase {
 
   private PoseEstimator poseEstimator;
 
-  public Shooter(PoseEstimator poseEstimator) {
+  private PIDController shootSpeedPID;
+
+  Drive drive;
+
+  public Shooter(PoseEstimator poseEstimator, Drive drive) {
+    this.drive = drive;
+
     this.bottomRoller = new TalonFX(Constants.Shooter.bottomRollerID);
     this.topRoller = new TalonFX(Constants.Shooter.topRollerID);
-
     this.feedMotor = new TalonFX(Constants.Shooter.feedMotorID);
+    this.deflectorMotor = new TalonFX(Constants.Shooter.deflectorMotorID);
 
     this.elevationEncoder = new DutyCycleEncoder(0);
+    this.deflectorEncoder = new DutyCycleEncoder(1);
 
     this.elevationMotor = new CANSparkMax(Constants.Shooter.elevationID, MotorType.kBrushless);
 
@@ -50,6 +59,8 @@ public class Shooter extends SubsystemBase {
     elevationMotor.burnFlash();
 
     this.poseEstimator = poseEstimator;
+
+    shootSpeedPID = new PIDController(1.2, 0, 0);
   }
 
   @Override
@@ -57,24 +68,29 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("Shooter TOF", getRange());
     SmartDashboard.putNumber("Shooter Encoder", elevationEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("Shooter TOF", shooterSensor.getRangeSigma());
+    SmartDashboard.putNumber("Deflector Encoder", deflectorEncoder.getAbsolutePosition());
 
     SmartDashboard.putNumber("Shooter Elevation Angle", getShooterAngle());
     SmartDashboard.putNumber("Shooter Elevation Target", targetAngle);
 
-    if(RobotContainer.getSpeakerElevationButton()) {
-      targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 6 + (poseEstimator.getDistanceToSpeaker()/3.5);
+    if (RobotContainer.getSpeakerElevationButton()) {
+      // targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 6 +
+      // (poseEstimator.getDistanceToSpeaker()/3.5);
+      targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 0.44*(poseEstimator.getDistanceToSpeaker()) + (drive.getVelocityX()*1.0);
     }
   }
 
   public void spool(double bottomSpeed, double topSpeed) {
-    bottomRoller.set(-bottomSpeed);
-    topRoller.set(topSpeed);
+    bottomRoller.set(-shootSpeedPID.calculate(-bottomSpeed));
+    //bottomRoller.set(-bottomSpeed);
+    topRoller.set(-shootSpeedPID.calculate(topSpeed));
+    //topRoller.set(topSpeed);
   }
 
   public void setFeedMotor(double speed) {
     feedMotor.set(speed);
   }
+
   public double getSensorSigma() {
     return shooterSensor.getRangeSigma();
   }
@@ -88,6 +104,14 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setElevationMotor(double value) {
+    /*if (elevationEncoder.getAbsolutePosition() > Constants.Shooter.maxEncoder && value > 0) {
+      return;
+    }
+
+    if (elevationEncoder.getAbsolutePosition() < Constants.Shooter.minEncoder && value < 0) {
+      return;
+    }*/
+
     elevationMotor.set(value);
   }
 
@@ -104,7 +128,13 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getShooterAngle() {
-    return (1-Math.abs(elevationEncoder.getAbsolutePosition() - Constants.Shooter.minEncoder) / Math.abs(Constants.Shooter.maxEncoder - Constants.Shooter.minEncoder)) * (Constants.Shooter.minAngle - Constants.Shooter.maxAngle) + Constants.Shooter.maxAngle;
+    return (1 - Math.abs(elevationEncoder.getAbsolutePosition() - Constants.Shooter.minEncoder)
+        / Math.abs(Constants.Shooter.maxEncoder - Constants.Shooter.minEncoder))
+        * (Constants.Shooter.minAngle - Constants.Shooter.maxAngle) + Constants.Shooter.maxAngle;
+  }
+
+  public void setDeflectorMotor(double value) {
+    deflectorMotor.set(value);
   }
 
 }

@@ -51,21 +51,17 @@ public class TeleopSwerve extends Command {
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
 
-        // System.out.println(translationVal + "" + strafeVal);
-
-
-        //TODO:: Speaker allignments
         if (RobotContainer.getSpeakerAlignButton()) {
 
             if (RobotContainer.isRed()) {
                 rotationVal = speakerAlignPID.calculate(s_Swerve.getHeading().getDegrees()
-                        - (poseEstimator.getRotationToSpeaker(RobotContainer.isRed()))) / 12;
+                        - (poseEstimator.getRotationToSpeaker(RobotContainer.isRed()) - (s_Swerve.getVelocityY() * 5))) / 15;
             } else {
-                rotationVal = -speakerAlignPID.calculate(s_Swerve.getHeading().getDegrees()
-                        - (-poseEstimator.getRotationToSpeaker(RobotContainer.isRed()))) / 12;
+                rotationVal = speakerAlignPID.calculate(s_Swerve.getHeading().getDegrees()
+                        - (-poseEstimator.getRotationToSpeaker(false) + s_Swerve.getVelocityY() * 2)) / 15;
             }
 
-            if (Math.abs(rotationVal) < 0.05) {
+            if (Math.abs(rotationVal) < 0.01) {
                 rotationVal = 0;
             }
 

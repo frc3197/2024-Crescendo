@@ -33,9 +33,9 @@ import frc.robot.RobotContainer;
 public class PoseEstimator extends SubsystemBase {
 
   // Pose estimator standard deviations
-  private static final edu.wpi.first.math.Vector<N3> stateStdDevs = VecBuilder.fill(0.05, 0.05,
+  private static final edu.wpi.first.math.Vector<N3> stateStdDevs = VecBuilder.fill(0.025, 0.025,
       Units.degreesToRadians(0.05));
-  private static final edu.wpi.first.math.Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5,
+  private static final edu.wpi.first.math.Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.2, 0.2,
       Units.degreesToRadians(5));
 
   // Pose estimator, field image
@@ -119,6 +119,10 @@ public class PoseEstimator extends SubsystemBase {
 
     SmartDashboard.putBoolean("Red", RobotContainer.isRed());
 
+  }
+
+  public void setPose(Pose2d pose) {
+        poseEstimator.resetPosition(drive.getHeading(), drive.getModulePositions(), pose);
   }
 
   // Returns pose to be used in Shuffleboard
