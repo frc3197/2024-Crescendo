@@ -1,8 +1,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -238,6 +235,10 @@ public class RobotContainer {
 
                 driveController.b().whileTrue(new AlignNote(vision, drive));
 
+                // TODO remove these temporary deflector commands
+
+                shootController.povLeft().onTrue(new InstantCommand(() -> shooter.setDeflectorMotor(0.2))).onFalse(new InstantCommand(() -> shooter.setDeflectorMotor(0)));
+                shootController.povRight().onTrue(new InstantCommand(() -> shooter.setDeflectorMotor(-0.2))).onFalse(new InstantCommand(() -> shooter.setDeflectorMotor(0)));
         }
 
         public Command getAutonomousCommand() {
