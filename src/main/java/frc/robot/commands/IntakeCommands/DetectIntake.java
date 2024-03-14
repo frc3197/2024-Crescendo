@@ -24,7 +24,9 @@ public class DetectIntake extends Command {
   public void execute() {}
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    intake.setRollers(0);
+  }
 
   @Override
   public boolean isFinished() {

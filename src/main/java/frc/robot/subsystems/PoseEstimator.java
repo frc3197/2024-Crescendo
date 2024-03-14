@@ -116,6 +116,7 @@ public class PoseEstimator extends SubsystemBase {
     SmartDashboard.putNumber("Gyro Heading", drive.getHeading().getDegrees());
     
     SmartDashboard.putNumber("Elevation to speaker", getElevationAngle(RobotContainer.isRed()));
+    SmartDashboard.putNumber("Distance to speaker", getDistanceToRedSpeaker());
 
     SmartDashboard.putBoolean("Red", RobotContainer.isRed());
 
@@ -240,6 +241,10 @@ public class PoseEstimator extends SubsystemBase {
         Math.atan(Constants.Vision.speakerHeight / (red ? getDistanceToRedSpeaker() : getDistanceToBlueSpeaker())));
   }
 
+  public double getDistanceToSpeakerTop(boolean red) {
+    return Math.sqrt(Math.pow(red ? getDistanceToRedSpeaker() : getDistanceToBlueSpeaker(), 2) + Math.pow(Constants.Vision.speakerHeight, 2)); 
+  }
+
   public double getRotationToSpeaker(boolean red) {
     if (getCurrentPose().getY() > Constants.Vision.speakerRedTranslation.getY()) {
       return Math.toDegrees((Math.atan((red ? getXDistanceToRedSpeaker() : getXDistanceToBlueSpeaker())
@@ -247,5 +252,13 @@ public class PoseEstimator extends SubsystemBase {
     }
     return 90 + Math.toDegrees((Math.atan((red ? getXDistanceToRedSpeaker() : getXDistanceToBlueSpeaker())
         / (red ? getYDistanceToRedSpeaker() : getYDistanceToBlueSpeaker()))));
+  }
+
+  public double getFormulaAngleToSpeaker(boolean red) {
+    return red ? evaluateFormula(getDistanceToBlueSpeaker()) : evaluateFormula(getDistanceToRedSpeaker());
+  }
+
+  private double evaluateFormula(double distance) {
+    return distance;
   }
 }

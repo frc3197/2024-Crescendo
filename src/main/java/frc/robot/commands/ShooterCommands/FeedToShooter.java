@@ -27,12 +27,12 @@ public class FeedToShooter extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    //shooter.setFeedMotor(0);
+    shooter.setFeedMotor(0);
   }
 
   @Override
   public boolean isFinished() {
     //return false || RobotContainer.getIntakeCancelButton();
-    return shooter.getRange() < 125 || RobotContainer.getIntakeCancelButton();
+    return shooter.getRange() < 110 || RobotContainer.getIntakeCancelButton();
   }
 }

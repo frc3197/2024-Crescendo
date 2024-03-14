@@ -55,10 +55,10 @@ public class TeleopSwerve extends Command {
 
             if (RobotContainer.isRed()) {
                 rotationVal = speakerAlignPID.calculate(s_Swerve.getHeading().getDegrees()
-                        - (poseEstimator.getRotationToSpeaker(RobotContainer.isRed()) - (s_Swerve.getVelocityY() * 5))) / 15;
+                        - (poseEstimator.getRotationToSpeaker(RobotContainer.isRed()) - (s_Swerve.getVelocityY() * 4))) / 15;
             } else {
                 rotationVal = speakerAlignPID.calculate(s_Swerve.getHeading().getDegrees()
-                        - (-poseEstimator.getRotationToSpeaker(false) + s_Swerve.getVelocityY() * 2)) / 15;
+                        - (-poseEstimator.getRotationToSpeaker(false) + s_Swerve.getVelocityY() * 4)) / 15;
             }
 
             if (Math.abs(rotationVal) < 0.01) {

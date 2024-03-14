@@ -4,28 +4,50 @@
 
 package frc.robot.commands.ShooterCommands;
 
+import com.fasterxml.jackson.databind.introspect.ConcreteBeanPropertyBase;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 
 public class DeployAmp extends Command {
 
   private Shooter shooter;
+  private double threshold = 0.002;
 
-  public DeployAmp(Shooter shooter) {
+  private double speed = 0.15;
+  private double upSpeed = 0.225;
+  private DeflectorDirection direction;
+
+
+
+  public DeployAmp(Shooter shooter, DeflectorDirection direction) {
     this.shooter = shooter;
+    this.direction = direction;
   }
 
   @Override
   public void initialize() {}
 
   @Override
-  public void execute() {}
+  public void execute() {
+    if(direction == DeflectorDirection.DOWN) {
+      shooter.setDeflectorMotor(speed);
+    } else {
+      shooter.setDeflectorMotor(-upSpeed);
+    }
+  }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    shooter.setDeflectorMotor(0);
+  }
 
   @Override
   public boolean isFinished() {
-    return false;
+    if(direction == DeflectorDirection.UP) {
+      return shooter.getDeflectorRotation() > Constants.Shooter.deflectorEncoderUp - threshold;
+    }
+    return shooter.getDeflectorRotation() < threshold + Constants.Shooter.deflectorEncoderDown;
   }
 }

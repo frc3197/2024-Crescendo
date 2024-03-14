@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +30,7 @@ public class Intake extends SubsystemBase {
     deployMotor = new TalonFX(Constants.Intake.deployMotorID);
 
     intakeSensor = new TimeOfFlight(Constants.Intake.IntakeTOFID);
-
+    intakeSensor.setRangingMode(RangingMode.Short, 1);
   }
 
   @Override

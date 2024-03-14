@@ -28,8 +28,6 @@ public class Shooter extends SubsystemBase {
   private DutyCycleEncoder elevationEncoder;
   private DutyCycleEncoder deflectorEncoder;
 
-  private boolean isRed = RobotContainer.isRed();
-
   private TimeOfFlight shooterSensor;
 
   private double targetAngle;
@@ -72,19 +70,26 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("Shooter Elevation Angle", getShooterAngle());
     SmartDashboard.putNumber("Shooter Elevation Target", targetAngle);
+    
+    SmartDashboard.putNumber("Top Roller Velocity", topRoller.getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Bottom Roller Velocity", bottomRoller.getVelocity().getValueAsDouble());
 
     if (RobotContainer.getSpeakerElevationButton()) {
       // targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 6 +
       // (poseEstimator.getDistanceToSpeaker()/3.5);
-      targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 0.44*(poseEstimator.getDistanceToSpeaker()) + (drive.getVelocityX()*1.0);
+      //targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 0.495*(poseEstimator.getDistanceToSpeaker()) + (drive.getVelocityX()*1.15);
+      targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed()) + 0.22*(poseEstimator.getDistanceToSpeakerTop(RobotContainer.isRed())) + (drive.getVelocityX()*1.285);
+      //targetAngle = 1.85+ poseEstimator.getElevationAngle(RobotContainer.isRed()) + 0.65*(poseEstimator.getDistanceToSpeakerTop(RobotContainer.isRed())) + (drive.getVelocityX()*1.15);
+      //targetAngle = poseEstimator.getElevationAngle(RobotContainer.isRed());
     }
   }
 
   public void spool(double bottomSpeed, double topSpeed) {
-    bottomRoller.set(-shootSpeedPID.calculate(-bottomSpeed));
     //bottomRoller.set(-bottomSpeed);
-    topRoller.set(-shootSpeedPID.calculate(topSpeed));
     //topRoller.set(topSpeed);
+    bottomRoller.set(-shootSpeedPID.calculate(-bottomSpeed));
+    topRoller.set(-shootSpeedPID.calculate(topSpeed));
+    //System.out.println("Spooling" + bottomSpeed);
   }
 
   public void setFeedMotor(double speed) {
@@ -116,6 +121,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTargetAngle(double value) {
+    System.out.println("Set target angle to " + value);
     targetAngle = value;
   }
 
@@ -135,6 +141,10 @@ public class Shooter extends SubsystemBase {
 
   public void setDeflectorMotor(double value) {
     deflectorMotor.set(value);
+  }
+
+  public double getDeflectorRotation() {
+    return deflectorEncoder.getAbsolutePosition();
   }
 
 }

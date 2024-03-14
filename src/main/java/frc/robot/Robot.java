@@ -81,6 +81,13 @@ public class Robot extends TimedRobot {
     }
 
     RobotContainer.setAutoTrackSpeaker(false);
+
+    RobotContainer.getShooter().spool(0, 0);
+    RobotContainer.getShooter().setFeedMotor(0);
+    RobotContainer.getIntake().setRollers(0);
+    RobotContainer.getIntake().setDirectional(0);
+    RobotContainer.getClimber().setLeftClimber(0);
+    RobotContainer.getClimber().setRightClimber(0);
   }
 
   /** This function is called periodically during operator control. */

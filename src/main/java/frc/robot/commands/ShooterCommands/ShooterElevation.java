@@ -17,7 +17,7 @@ public class ShooterElevation extends Command {
 
   private PIDController elevationPID;
 
-  private double maxSpeed = 0.85;
+  private double maxSpeed = 0.9;
 
   public ShooterElevation(Shooter shooter) {
     this.shooter = shooter;
@@ -46,6 +46,7 @@ public class ShooterElevation extends Command {
 
     speed = MathUtil.clamp(speed, -maxSpeed, maxSpeed);
 
+    
     shooter.setElevationMotor(speed);
   }
 

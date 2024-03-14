@@ -18,12 +18,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.autos.*;
 import frc.robot.commands.AlignCommands.AlignNote;
+import frc.robot.commands.AlignCommands.AlignSpeaker;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.DetectIntake;
 import frc.robot.commands.MiscCommands.AlertCommand;
 import frc.robot.commands.MiscCommands.TeleopSwerve;
+import frc.robot.commands.ShooterCommands.DeployAmp;
 import frc.robot.commands.ShooterCommands.FeedToShooter;
+import frc.robot.commands.ShooterCommands.ManuelUpDown;
 import frc.robot.commands.ShooterCommands.ShooterElevation;
+import frc.robot.commands.ShooterCommands.DeflectorDirection;
 import frc.robot.subsystems.*;
 
 public class RobotContainer {
@@ -67,79 +71,56 @@ public class RobotContainer {
                 SmartDashboard.putData(autoChooser);
                 SmartDashboard.putData(poseChooser);
 
-                autoChooser.addOption("Middle 2p", AutoLookup.getAuto("Middle 2p"));
+                //autoChooser.addOption("Stay Still", AutoLookup.getAuto("Only Shoot"));
+                //autoChooser.addOption("test", AutoLookup.getAuto("TEST"));
 
-                autoChooser.addOption("Middle 3p-podium", AutoLookup.getAuto("Middle 3p-podium"));
-                autoChooser.addOption("Middle 3p-amp", AutoLookup.getAuto("Middle 3p-amp"));
-                autoChooser.addOption("Middle 4p", AutoLookup.getAuto("Middle 4p"));
-                autoChooser.addOption("Amp - 2p", AutoLookup.getAuto("2p amp"));
-
-                autoChooser.addOption("Stay Still", AutoLookup.getAuto("Only Shoot"));
-                autoChooser.addOption("test", AutoLookup.getAuto("TEST"));
-                autoChooser.addOption("test blue", AutoLookup.getAuto("test2"));
-                
-                autoChooser.addOption("Subwoofer 5-6-7", AutoLookup.getAuto("Subwoofer 5-6-7"));
-
-                CameraServer.startAutomaticCapture();
+                autoChooser.addOption("Subwoofer 6-7-8", AutoLookup.getAuto("Subwoofer 6-7-8"));
+                autoChooser.addOption("Source 4-5", AutoLookup.getAuto("Source 4-5"));
+                autoChooser.addOption("Subwoofer 1-2-3", AutoLookup.getAuto("Subwoofer 1-2-3"));
+                autoChooser.addOption("Subwoofer 5-6", AutoLookup.getAuto("Subwoofer 5-6"));
 
                 poseChooser.addOption("REDMID", new Pose2d(new Translation2d(15.11, 5.53), new Rotation2d(180)));
                 poseChooser.addOption("REDAMP", new Pose2d(new Translation2d(15.86, 6.68), new Rotation2d(180)));
-                poseChooser.addOption("REDSOURCE", new Pose2d(new Translation2d(15.82, 4.43), new Rotation2d(180)));
-  
+                poseChooser.addOption("REDSOURCE", new Pose2d(new Translation2d(15.107, 3.725), new Rotation2d(180)));
+
                 poseChooser.addOption("BLUEMID", new Pose2d(new Translation2d(1.34, 5.56), new Rotation2d(180)));
+                poseChooser.addOption("BLUESOURCE", new Pose2d(new Translation2d(1.485, 3.725), new Rotation2d(180)));
 
                 poseChooser.addOption("0, 0", new Pose2d(new Translation2d(0, 0), new Rotation2d(180)));
                 poseChooser.addOption("16.5, 0", new Pose2d(new Translation2d(16.5, 0), new Rotation2d(180)));
-
-                
 
         }
 
         private void configureButtonBindings() {
                 driveController.start().onTrue(new InstantCommand(() -> drive.zeroHeading()));
 
-                shootController.rightTrigger(0.25).onTrue(new InstantCommand(() -> shooter.spool(0.8, 0.8)))
+                shootController.rightTrigger(0.25).onTrue(new InstantCommand(() -> shooter.spool(0.8, 0.825)))
                                 .onFalse(new InstantCommand(() -> shooter.spool(0.0, 0.0)));
 
-                shootController.leftTrigger(0.25).onTrue(new InstantCommand(() -> shooter.spool(0.24, 0.16)))
-                                .onFalse(new InstantCommand(() -> shooter.spool(0.0, 0.0)));
+                /*
+                 * shootController.leftTrigger(0.25).onTrue(new InstantCommand(() ->
+                 * shooter.spool(0.24, 0.16)))
+                 * .onFalse(new InstantCommand(() -> shooter.spool(0.0, 0.0)));
+                 */
+                // Old was 52
+                shootController.leftTrigger(0.25).onTrue(new ParallelCommandGroup(
+                                new InstantCommand(() -> shooter.spool(0.23, 0.15)),
+                                new DeployAmp(shooter, DeflectorDirection.UP),
+                                new InstantCommand(() -> shooter.setTargetAngle(57)))).onFalse(
+                                                new ParallelCommandGroup(
+                                                                new InstantCommand(() -> shooter.spool(0, 0)),
+                                                                new DeployAmp(shooter, DeflectorDirection.DOWN)));
 
                 shootController.rightBumper().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> intake.setRollers(0.5)),
-                                                new InstantCommand(() -> shooter.setFeedMotor(-0.55)),
+                                                new InstantCommand(() -> shooter.setFeedMotor(-0.75)),
                                                 new InstantCommand(() -> intake.setDirectional(-0.25))))
                                 .onFalse(
                                                 new SequentialCommandGroup(
                                                                 new InstantCommand(() -> intake.setRollers(0)),
                                                                 new InstantCommand(() -> shooter.setFeedMotor(0)),
                                                                 new InstantCommand(() -> intake.setDirectional(0))));
-
-
-
-
-
-                // TODO TESTING ONLY FOR SHOOT ON ONE CONTROLLER
-                driveController.x().onTrue(
-                                new SequentialCommandGroup(
-                                                new InstantCommand(() -> intake.setRollers(0.5)),
-                                                new InstantCommand(() -> shooter.setFeedMotor(-0.55)),
-                                                new InstantCommand(() -> intake.setDirectional(-0.25))))
-                                .onFalse(
-                                                new SequentialCommandGroup(
-                                                                new InstantCommand(() -> intake.setRollers(0)),
-                                                                new InstantCommand(() -> shooter.setFeedMotor(0)),
-                                                                new InstantCommand(() -> intake.setDirectional(0))));
-                driveController.a().onTrue(new InstantCommand(() -> shooter.spool(0.8, 0.8)))
-                                .onFalse(new InstantCommand(() -> shooter.spool(0.0, 0.0)));
-
-
-
-
-
-
-
-
 
                 shootController.y().onTrue(new InstantCommand(() -> shooter.setTargetAngle(52)));
                 shootController.a().onTrue(new InstantCommand(() -> shooter.setTargetAngle(25)));
@@ -147,32 +128,35 @@ public class RobotContainer {
                 shootController.povUp()
                                 .onTrue(new SequentialCommandGroup(
                                                 new InstantCommand(() -> climber.setLeftClimber(-0.7)),
-                                                new InstantCommand(() -> climber.setRightClimber(-0.7))))
+                                                new InstantCommand(() -> climber.setRightClimber(-0.7)),
+                                                new DeployAmp(shooter, DeflectorDirection.UP)))
                                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> climber.setLeftClimber(0)),
                                                 new InstantCommand(() -> climber.setRightClimber(0))));
                 shootController.povUpLeft()
-                .onTrue(new SequentialCommandGroup(
+                                .onTrue(new SequentialCommandGroup(
                                                 new InstantCommand(() -> climber.setLeftClimber(-0.7)),
-                                                new InstantCommand(() -> climber.setRightClimber(-0.7))))
+                                                new InstantCommand(() -> climber.setRightClimber(-0.7)),
+                                                new DeployAmp(shooter, DeflectorDirection.UP)))
                                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> climber.setLeftClimber(0)),
                                                 new InstantCommand(() -> climber.setRightClimber(0))));
 
                 shootController.povUpRight()
-                .onTrue(new SequentialCommandGroup(
+                                .onTrue(new SequentialCommandGroup(
                                                 new InstantCommand(() -> climber.setLeftClimber(-0.7)),
-                                                new InstantCommand(() -> climber.setRightClimber(-0.7))))
+                                                new InstantCommand(() -> climber.setRightClimber(-0.7)),
+                                                new DeployAmp(shooter, DeflectorDirection.UP)))
                                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> climber.setLeftClimber(0)),
                                                 new InstantCommand(() -> climber.setRightClimber(0))));
 
                 shootController.povDownLeft()
-                .onTrue(new SequentialCommandGroup(
+                                .onTrue(new SequentialCommandGroup(
                                                 new InstantCommand(() -> climber.setLeftClimber(1)),
                                                 new InstantCommand(() -> climber.setRightClimber(1))))
                                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> climber.setLeftClimber(0)),
                                                 new InstantCommand(() -> climber.setRightClimber(0))));
 
                 shootController.povDownRight()
-                .onTrue(new SequentialCommandGroup(
+                                .onTrue(new SequentialCommandGroup(
                                                 new InstantCommand(() -> climber.setLeftClimber(1)),
                                                 new InstantCommand(() -> climber.setRightClimber(1))))
                                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> climber.setLeftClimber(0)),
@@ -199,30 +183,38 @@ public class RobotContainer {
                                                                 new InstantCommand(() -> intake.setDirectional(0)),
                                                                 new InstantCommand(() -> intake.setRollers(0))));
 
-                shootController.x().onTrue(
-                                new SequentialCommandGroup(
-                                                new InstantCommand(() -> shooter.setFeedMotor(0.4)),
-                                                new InstantCommand(() -> intake.setDirectional(0.2)),
-                                                new InstantCommand(() -> intake.setRollers(-0.75)),
-                                                new WaitCommand(0.05),
-                                                new InstantCommand(() -> shooter.setFeedMotor(-0.4)),
-                                                new InstantCommand(() -> intake.setDirectional(-0.2)),
-                                                new InstantCommand(() -> intake.setRollers(0.75)),
-                                                new WaitCommand(0.12),
-                                                new InstantCommand(() -> shooter.setFeedMotor(0)),
-                                                new InstantCommand(() -> intake.setDirectional(0)),
-                                                new InstantCommand(() -> intake.setRollers(0)))
-                                                );
+                /*
+                 * shootController.x().onTrue(
+                 * new SequentialCommandGroup(
+                 * new InstantCommand(() -> shooter.setFeedMotor(0.4)),
+                 * new InstantCommand(() -> intake.setDirectional(0.2)),
+                 * new InstantCommand(() -> intake.setRollers(-0.75)),
+                 * new WaitCommand(0.05),
+                 * new InstantCommand(() -> shooter.setFeedMotor(-0.4)),
+                 * new InstantCommand(() -> intake.setDirectional(-0.2)),
+                 * new InstantCommand(() -> intake.setRollers(0.75)),
+                 * new WaitCommand(0.12),
+                 * new InstantCommand(() -> shooter.setFeedMotor(0)),
+                 * new InstantCommand(() -> intake.setDirectional(0)),
+                 * new InstantCommand(() -> intake.setRollers(0)))
+                 * );
+                 */
 
-                  /*    
-                  driveController.a().onTrue(new InstantCommand(() ->
-                  shooter.setElevationMotor(0.35))).onFalse(new InstantCommand(() ->
-                  shooter.setElevationMotor(0.0)));
-                  driveController.y().onTrue(new InstantCommand(() ->
-                  shooter.setElevationMotor(-0.35))).onFalse(new InstantCommand(() ->
-                  shooter.setElevationMotor(0.0)));
-                  */
-                 
+                // TODO MANUEL ELEVATION
+
+                /*
+                 * driveController.a().onTrue(new InstantCommand(() ->
+                 * shooter.setElevationMotor(0.35))).onFalse(new InstantCommand(() ->
+                 * shooter.setElevationMotor(0.0)));
+                 * driveController.y().onTrue(new InstantCommand(() ->
+                 * shooter.setElevationMotor(-0.35))).onFalse(new InstantCommand(() ->
+                 * shooter.setElevationMotor(0.0)));
+                 */
+                driveController.a().whileTrue(new ManuelUpDown(shooter, -0.05));
+                driveController.y().whileTrue(new ManuelUpDown(shooter, 0.05));
+
+                shootController.x().toggleOnTrue(new DeployAmp(shooter, DeflectorDirection.UP).withTimeout(1.2))
+                                .toggleOnTrue(new DeployAmp(shooter, DeflectorDirection.DOWN).withTimeout(1.25));
 
                 driveController.rightTrigger().onTrue(
                                 getIntakeCommand());
@@ -233,22 +225,36 @@ public class RobotContainer {
                 shootController.b().onTrue(new InstantCommand(() -> shooter.setFeedMotor(0.3)))
                                 .onFalse(new InstantCommand(() -> shooter.setFeedMotor(0)));
 
-                driveController.b().whileTrue(new AlignNote(vision, drive));
+                //driveController.b().whileTrue(new AlignNote(vision, drive, intake));
+                //driveController.b().whileTrue(new AlignSpeaker(drive, poseEstimator));
+                driveController.b().whileTrue(new AlignNote(vision, drive, intake));
 
-                // TODO remove these temporary deflector commands
 
-                shootController.povLeft().onTrue(new InstantCommand(() -> shooter.setDeflectorMotor(0.2))).onFalse(new InstantCommand(() -> shooter.setDeflectorMotor(0)));
-                shootController.povRight().onTrue(new InstantCommand(() -> shooter.setDeflectorMotor(-0.2))).onFalse(new InstantCommand(() -> shooter.setDeflectorMotor(0)));
+                // TODO TESTING ONLY FOR SHOOT ON ONE CONTROLLER
+                
+                  driveController.x().onTrue(
+                  new SequentialCommandGroup(
+                  new InstantCommand(() -> intake.setRollers(0.5)),
+                  new InstantCommand(() -> shooter.setFeedMotor(-0.55)),
+                  new InstantCommand(() -> intake.setDirectional(-0.25))))
+                  .onFalse(
+                  new SequentialCommandGroup(
+                  new InstantCommand(() -> intake.setRollers(0)),
+                  new InstantCommand(() -> shooter.setFeedMotor(0)),
+                  new InstantCommand(() -> intake.setDirectional(0))));
+                  driveController.a().onTrue(new InstantCommand(() -> shooter.spool(0.8, 0.825)))
+                  .onFalse(new InstantCommand(() -> shooter.spool(0.0, 0.0)));
+                  
+                 
+
         }
 
         public Command getAutonomousCommand() {
                 drive.setOdometry(getInitialPose());
                 poseEstimator.setPose(getInitialPose());
 
-                System.out.println(getInitialPose().getX() + ", " + getInitialPose().getY() + ", " + getInitialPose().getRotation());
-
-
-                
+                System.out.println(getInitialPose().getX() + ", " + getInitialPose().getY() + ", "
+                                + getInitialPose().getRotation());
 
                 return new SequentialCommandGroup(
                                 new InstantCommand(
@@ -340,9 +346,9 @@ public class RobotContainer {
                                                                                 .setDirectional(-0.1)),
 
                                                                 new FeedToShooter(shooter),
-                                                                
-                                                                //new InstantCommand(() -> shooter.setFeedMotor(0.25)),
-                                                                //new WaitCommand(0.175),
+
+                                                                // new InstantCommand(() -> shooter.setFeedMotor(0.25)),
+                                                                // new WaitCommand(0.175),
 
                                                                 new InstantCommand(() -> intake
                                                                                 .setRollers(0)),
@@ -350,5 +356,13 @@ public class RobotContainer {
                                                                                 .setDirectional(0)),
                                                                 new InstantCommand(() -> shooter
                                                                                 .setFeedMotor(0)))));
+        }
+
+        public static Command getFeedCommand() {
+                return new ParallelCommandGroup (
+                        //new InstantCommand(() -> intake.setRollers(0.5)),
+                        new InstantCommand(() -> shooter.setFeedMotor(-0.75)),
+                        new InstantCommand(() -> intake.setDirectional(-0.25))
+                );
         }
 }

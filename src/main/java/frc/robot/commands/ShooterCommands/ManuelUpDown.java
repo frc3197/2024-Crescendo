@@ -2,17 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.autos;
+package frc.robot.commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Shooter;
 
-public class AlignSpeaker extends Command {
+public class ManuelUpDown extends Command {
+  /** Creates a new ManuelUpDown. */
+  private Shooter shooter;
+  private double value;
 
-  private Drive drive;
-
-  public AlignSpeaker(Drive drive) {
-    this.drive = drive;
+  public ManuelUpDown(Shooter shooter, double value) {
+    this.value = value;
+    this.shooter = shooter;
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -21,7 +24,9 @@ public class AlignSpeaker extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    shooter.setTargetAngle(shooter.getTargetAngle() + value);
+  }
 
   // Called once the command ends or is interrupted.
   @Override

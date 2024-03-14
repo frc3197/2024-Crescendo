@@ -103,7 +103,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 3.5; // TODO: This must be tuned to specific robot 3.5
+        public static final double maxSpeed = 4.85; // TODO: This must be tuned to specific robot 3.5
         /** Radians per Second */
         public static final double maxAngularVelocity = 10.0; // TODO: This must be tuned to specific robot
 
@@ -116,7 +116,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-147.919921875);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(142.470703125);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -126,7 +126,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-141.767578125);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-152.25);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -136,7 +136,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(70.6640625);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(68.79);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -146,7 +146,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-37.44140625);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-38.05);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -165,7 +165,7 @@ public final class Constants {
 
         public static final Translation2d speakerRedTranslation = new Translation2d(16.542, 5.541);
         public static final Translation2d speakerBlueTranslation = new Translation2d(0, 5.541);
-        public static final double speakerHeight = 2.0;
+        public static final double speakerHeight = 2.138;
     }
 
     public static final class Intake {
@@ -174,7 +174,7 @@ public final class Constants {
         public static final int directionalMotorID = 15;
 
         public static final int IntakeTOFID = 1;
-        public static final int TOFRange = 178;
+        public static final int TOFRange = 195;
 
     }
 
@@ -195,14 +195,17 @@ public final class Constants {
         public static final int ShooterTOFID = 0;
 
         // Highest point
-        public static final double minEncoder = 0.352;
+        public static final double minEncoder = 0.354;
         // Lowest point
-        public static final double maxEncoder = 0.805;
+        public static final double maxEncoder = 0.802;
 
         // Highest point subwoofer
         public static final double minAngle = 60;
         // Lowest point
         public static final double maxAngle = 15;
+
+        public static final double deflectorEncoderUp = 0.676;
+        public static final double deflectorEncoderDown = 0.508;
     }
 
     public static final class Climber {
